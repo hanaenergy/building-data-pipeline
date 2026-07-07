@@ -1,6 +1,6 @@
-# Building Data Pipeline
+# Automated Building Data Enrichment Pipeline
 
-An automated ETL pipeline that cleans inconsistent building data, enriches it with public climate data, and generates data quality reports for energy analysis.
+An automated ETL pipeline that transforms messy building data into a trusted analysis-ready dataset by enriching it with public climate and building reference data.
 
 ## Business Problem
 
