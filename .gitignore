@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual Environment
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Generated output (keep folders, ignore contents)
+data/processed/*
+!data/processed/.gitkeep
+
+reports/*
+!reports/.gitkeep
