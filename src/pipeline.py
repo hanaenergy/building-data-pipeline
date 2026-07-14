@@ -8,6 +8,42 @@ from weather import fetch_climate_data
 from benchmark import enrich_benchmark_data
 from materials import calculate_embodied_carbon
 
+def generate_quality_report(df):
+    """
+    Parses the Data_Quality_Flag column and prints a structured summary to the terminal.
+    """
+    print("\n==================================================")
+    print(" FINAL DATA QUALITY REPORT")
+    print("==================================================")
+    
+    total_records = len(df)
+    flags = df['Data_Quality_Flag'].fillna("").astype(str)
+    
+    perfect_records = (flags == "").sum()
+    warnings = flags.str.contains("WARNING").sum()
+    outliers = flags.str.contains("OUTLIER").sum()
+    
+    print(f"Total Records Processed : {total_records}")
+    print(f"Perfect Records (Valid) : {perfect_records}")
+    print(f"Records with Warnings   : {warnings}")
+    print(f"Records with Outliers   : {outliers}")
+    
+    print("\n[Issue Breakdown]")
+    issue_counts = {}
+    for flag_string in flags:
+        if flag_string:
+            individual_flags = [f.strip() for f in flag_string.split("|")]
+            for flag in individual_flags:
+                issue_counts[flag] = issue_counts.get(flag, 0) + 1
+                
+    if not issue_counts:
+        print("- No issues detected.")
+    else:
+        for issue, count in sorted(issue_counts.items()):
+            print(f"- {issue} : {count}")
+            
+    print("==================================================")
+
 def run_pipeline():
     """
     Master function to orchestrate the ETL pipeline.
@@ -48,6 +84,9 @@ def run_pipeline():
     # 3. Final Validation & Export
     print("\n[STEP 7] Final Data Quality Validation & Export")
     df_final = df_lca.copy()
+
+    # Generate Terminal Report
+    generate_quality_report(df_final)
 
     # Add Pipeline Metadata
     df_final['Processing_Timestamp'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
