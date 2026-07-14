@@ -6,6 +6,7 @@ from clean_data import clean_building_data
 from geocode import geocode_buildings
 from weather import fetch_climate_data
 from benchmark import enrich_benchmark_data
+from materials import calculate_embodied_carbon
 
 def evaluate_data_quality(row):
     """
@@ -23,7 +24,7 @@ def run_pipeline():
     Master function to orchestrate the ETL pipeline.
     """
     print("="*60)
-    print(" STARTING HANA ENERGY ETL PIPELINE v1.0")
+    print(" STARTING HANA ENERGY ETL PIPELINE v1.5")
     print("="*60)
 
     # 1. Define Paths
@@ -51,15 +52,18 @@ def run_pipeline():
 
     print("\n[STEP 5] Reference Benchmark Enrichment")
     df_bench = enrich_benchmark_data(df_weather)
+    
+    print("\n[STEP 6] Material LCA Calculation (baubook)")
+    df_lca = calculate_embodied_carbon(df_bench)
 
     # 3. Final Validation & Export
-    print("\n[STEP 6] Final Data Quality Validation & Export")
-    df_final = df_bench.copy()
+    print("\n[STEP 7] Final Data Quality Validation & Export")
+    df_final = df_lca.copy()
 
     # Add Pipeline Metadata
     df_final['Data_Quality_Flag'] = df_final.apply(evaluate_data_quality, axis=1)
     df_final['Processing_Timestamp'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    df_final['Pipeline_Version'] = "v1.0"
+    df_final['Pipeline_Version'] = "v1.5"
 
     print(f"[INFO] Exporting final dataset to: {output_file}")
     df_final.to_excel(output_file, index=False)

@@ -1,0 +1,6 @@
+Material_ID,Material_Name,Embodied_Carbon_kgCO2e_per_kg,Category
+M001,Concrete,0.15,Structure
+M002,Timber,0.05,Structure
+M003,Brick,0.22,Structure
+M004,Glass,1.40,Facade
+M005,Insulation_EPS,3.20,Insulation

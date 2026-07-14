@@ -19,7 +19,7 @@ The pipeline operates as a modular, decoupled workflow structured as follows:
 * **Core Libraries:** Pandas, Openpyxl, Geopy, Requests
 * **Environment Isolation:** Virtual Environment (.venv) with frozen dependency tracking.
 
-## Data Quality and Resiliency Highlights (Interview Talking Points)
+## Data Quality and Resiliency Highlights
 * **Logical Deduplication:** Instead of relying on system-generated Building_IDs which can obscure duplicates, the cleaning module executes logical deduplication across composite physical keys (Address, Postal_Code, Floor_Area_m2), successfully trapping redundant data.
 * **Fault-Tolerant API Ingestion:** Built-in network resiliency to handle open-source API limitations:
   * Implemented a RateLimiter with strict time delays to respect server usage policies and prevent IP blocking.
