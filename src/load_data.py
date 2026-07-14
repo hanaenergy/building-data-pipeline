@@ -1,58 +1,34 @@
 import pandas as pd
 import os
 
-def load_and_validate_data(file_path):
-    """
-    Load raw building data from an Excel file and perform initial data quality validation.
-    
-    Args:
-        file_path (str): Path to the raw Excel file.
-        
-    Returns:
-        pd.DataFrame or None: Loaded dataframe if successful, None otherwise.
-    """
+def load_data(file_path):
     print(f"[INFO] Loading data from: {file_path}")
     
-    try:
-        df = pd.read_excel(file_path)
-    except FileNotFoundError:
-        print(f"[ERROR] File not found: {file_path}")
-        return None
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"[ERROR] File not found: {file_path}")
         
-    # --- Data Quality Report (Initial Load) ---
-    print("\n" + "="*50)
-    print(" DATA QUALITY REPORT: INITIAL LOAD")
-    print("="*50)
+    df = pd.read_excel(file_path)
     
-    # 1. Row/Column count
-    print(f"Total Rows Processed : {len(df)}")
-    print(f"Total Columns        : {len(df.columns)}")
+    # 1. Initialize Data Quality Flag column
+    df['Data_Quality_Flag'] = ""
     
-    # 2. Duplicate check
-    duplicate_count = df.duplicated().sum()
-    print(f"Duplicate Rows       : {duplicate_count}")
+    # 2. Rule: Missing Core Identifier (Error)
+    # Drop rows where Building_ID or Address is missing
+    initial_row_count = len(df)
+    df = df.dropna(subset=['Building_ID', 'Address'])
+    dropped_rows = initial_row_count - len(df)
     
-    # 3. Missing values check
-    missing_values = df.isnull().sum()
-    missing_cols = missing_values[missing_values > 0]
-    
-    if not missing_cols.empty:
-        print("\n[WARNING] Missing Values Detected:")
-        for col, count in missing_cols.items():
-            print(f" - {col}: {count} missing")
-    else:
-        print("\n[INFO] No missing values detected.")
+    if dropped_rows > 0:
+        print(f"[ERROR] Dropped {dropped_rows} rows due to missing Building_ID or Address.")
         
-    print("="*50 + "\n")
-    
     return df
 
 if __name__ == "__main__":
     # Set file path relative to the project root
     target_file = os.path.join("data", "raw", "building_data.xlsx")
     
-    # Execute function
-    raw_df = load_and_validate_data(target_file)
+    # Execute function (Fixed function name)
+    raw_df = load_data(target_file)
     
     # Display preview
     if raw_df is not None:

@@ -1,23 +1,12 @@
 import os
 import datetime
 import pandas as pd
-from load_data import load_and_validate_data
-from clean_data import clean_building_data
+from load_data import load_data
+from clean_data import clean_data
 from geocode import geocode_buildings
 from weather import fetch_climate_data
 from benchmark import enrich_benchmark_data
 from materials import calculate_embodied_carbon
-
-def evaluate_data_quality(row):
-    """
-    Evaluate the final record to assign a Data_Quality_Flag.
-    """
-    if pd.isnull(row.get('Latitude')) or pd.isnull(row.get('Heating_Degree_Days')):
-        return 'Warning: Missing API Data'
-    elif pd.isnull(row.get('Annual_Energy_kWh')):
-        return 'Warning: Missing Raw Energy Data'
-    else:
-        return 'Valid'
 
 def run_pipeline():
     """
@@ -36,13 +25,13 @@ def run_pipeline():
 
     # 2. Execute Pipeline Steps
     print("\n[STEP 1] Data Ingestion & Initial Validation")
-    df_raw = load_and_validate_data(input_file)
+    df_raw = load_data(input_file)
     if df_raw is None:
         print("[ERROR] Pipeline terminated due to missing input file.")
         return
 
     print("\n[STEP 2] Data Cleaning & Normalization")
-    df_clean = clean_building_data(df_raw)
+    df_clean = clean_data(df_raw)
 
     print("\n[STEP 3] Geocoding (Address to Coordinates)")
     df_geo = geocode_buildings(df_clean)
@@ -61,7 +50,6 @@ def run_pipeline():
     df_final = df_lca.copy()
 
     # Add Pipeline Metadata
-    df_final['Data_Quality_Flag'] = df_final.apply(evaluate_data_quality, axis=1)
     df_final['Processing_Timestamp'] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     df_final['Pipeline_Version'] = "v1.5"
 
